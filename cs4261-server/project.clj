@@ -5,6 +5,7 @@
                  [compojure "1.1.6"]
                  [org.clojure/data.json "0.2.5"]
                  [http-kit "2.1.6"]
+                 [clj-http "0.9.2"]
                  [ring/ring-core "1.2.0"]
                  [ring/ring-core "1.2.0"]
                  [ring/ring-json "0.3.1"]
