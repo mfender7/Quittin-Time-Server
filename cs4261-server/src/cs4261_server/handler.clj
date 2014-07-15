@@ -13,7 +13,7 @@
 (def base-get "http://api.yummly.com/v1/api/recipe/")
 (def base-search "http://api.yummly.com/v1/api/recipes?")
 (def api-key "_app_id=78dccce1&_app_key=87460fca330c28f52a9603ababd5a54f")
-(def base-query "&allowedCourse[]=course^course-Dinner&maxTotalTimeInSeconds=3600&")
+(def base-query "&allowedCourse[]=course^course-Dinner&maxTotalTimeInSeconds=3600&q=chicken")
 
 (defn get-ids [request]
   (json/read-str (get (client/get request) :body) :key-fn keyword))
@@ -21,7 +21,12 @@
 (defn get-recipe [id]
   (let [resp (client/get (str base-get id "?" api-key))]
     (let [body (json/read-str (get resp :body) :key-fn keyword)]
-      (json/write-str {:title id, :ingredients (:ingredientLines body)}))))
+      (apply array-map [:title id, 
+      				   :ingredients (:ingredientLines body)
+      				   :directions (:url (:attribution body))
+      				   :image (:hostedLargeUrl (:images body))
+      				   :cooktime "30"
+      				   :id (:id body)]))))
 
 (defn get-random [matches]
   (->> (shuffle matches)
@@ -29,14 +34,15 @@
        (take 3)))
 
 (defn search-recipes [param]
-  (let [req (str base-search api-key base-query param)
+  (let [req (str base-search api-key base-query)
         matches (:matches (get-ids req))]
     (->> (get-random matches)
-         (map get-recipe))))
+         (map get-recipe)
+         )))
 
 (defroutes app-routes
   (GET "/" [] (json/write-str "This is just some start screen to appease myself."))
-  (GET "/somerecipe" {params :query-string} (search-recipes params))
+  (GET "/somerecipe" {params :query-string} (json/write-str {:matches (search-recipes params)}))
   (GET "/recipes" [] (json/write-str { :message "This is some other different response"}))
   (route/resources "/")
   (route/not-found "This isn't the page you're looking for.."))
