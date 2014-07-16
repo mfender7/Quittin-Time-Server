@@ -10,21 +10,28 @@
             [ring.middleware.json :refer [wrap-json-params]]
             [ring.middleware.jsonp :refer [wrap-json-with-padding]]))
 
-(def base-get "http://api.yummly.com/v1/api/recipe/")
-(def base-search "http://api.yummly.com/v1/api/recipes?")
-(def api-key "_app_id=78dccce1&_app_key=87460fca330c28f52a9603ababd5a54f")
-(def base-query "&allowedCourse[]=course^course-Dinner&maxTotalTimeInSeconds=3600&q=chicken")
+(def yummly-search "http://api.yummly.com/v1/api/recipes?")
+(def yummly-api-key "_app_id=78dccce1&_app_key=87460fca330c28f52a9603ababd5a54f")
+(def yummly-base-query "&allowedCourse[]=course^course-Dinner&maxTotalTimeInSeconds=3600")
+(def yummly-base-food "&q=chicken")
+(def yummly-get "http://api.yummly.com/v1/api/recipe/")
+(def sensum-app-id "6235ff8a")
+(def sensum-app-key "a8f48743fe61043cdeb7bb411699d483")
+(def sensum-search "")
+(def map-latlon "http://maps.googleapis.com/maps/api/geocode/json?")
+(def map-stores "https://maps.googleapis.com/maps/api/place/nearbysearch/json?types=grocery_or_supermarket")
+(def map-key "&key=AIzaSyAdALk9fKSutYxvkBmfrODopOu1xuWRddc")
 
 (defn get-ids [request]
   (json/read-str (get (client/get request) :body) :key-fn keyword))
 
 (defn get-recipe [id]
-  (let [resp (client/get (str base-get id "?" api-key))]
+  (let [resp (client/get (str yummly-get id "?" yummly-api-key))]
     (let [body (json/read-str (get resp :body) :key-fn keyword)]
-      (apply array-map [:title id, 
+      (apply array-map [:title id,
       				   :ingredients (:ingredientLines body)
       				   :directions (:url (:attribution body))
-      				   :image (:hostedLargeUrl (:images body))
+      				   :images ((nth (:images body) 0) :hostedSmallUrl)
       				   :cooktime "30"
       				   :id (:id body)]))))
 
@@ -34,16 +41,26 @@
        (take 3)))
 
 (defn search-recipes [param]
-  (let [req (str base-search api-key base-query)
+  (let [req (str yummly-search yummly-api-key yummly-base-query yummly-base-food)
         matches (:matches (get-ids req))]
     (->> (get-random matches)
          (map get-recipe)
          )))
 
+(defn get-latlong [param]
+  (client/get (str map-latlon param)))
+
+(defn get-stores [param]
+  (client/get (str map-stores map-key "&" param)))
+
 (defroutes app-routes
   (GET "/" [] (json/write-str "This is just some start screen to appease myself."))
   (GET "/somerecipe" {params :query-string} (json/write-str {:matches (search-recipes params)}))
   (GET "/recipes" [] (json/write-str { :message "This is some other different response"}))
+  (POST "/user" {params :query-params} (str "todo: update users"))
+  (PUT "/user" {params :query-params} (str "todo: create users"))
+  (GET "/latlong" {params :query-string} (get-latlong params))
+  (GET "/stores" {params :query-string} (get-stores params))
   (route/resources "/")
   (route/not-found "This isn't the page you're looking for.."))
 
