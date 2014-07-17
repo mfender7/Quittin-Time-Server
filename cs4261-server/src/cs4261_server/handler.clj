@@ -15,9 +15,6 @@
 (def yummly-base-query "&allowedCourse[]=course^course-Dinner&maxTotalTimeInSeconds=3600")
 (def yummly-base-food "&q=chicken")
 (def yummly-get "http://api.yummly.com/v1/api/recipe/")
-(def sensum-app-id "6235ff8a")
-(def sensum-app-key "a8f48743fe61043cdeb7bb411699d483")
-(def sensum-search "")
 (def map-latlon "http://maps.googleapis.com/maps/api/geocode/json?")
 (def map-stores "https://maps.googleapis.com/maps/api/place/nearbysearch/json?types=grocery_or_supermarket")
 (def map-key "&key=AIzaSyAdALk9fKSutYxvkBmfrODopOu1xuWRddc")
@@ -25,15 +22,23 @@
 (defn get-ids [request]
   (json/read-str (get (client/get request) :body) :key-fn keyword))
 
-(defn get-recipe [id]
+(defn get-yummly-body [id]
   (let [resp (client/get (str yummly-get id "?" yummly-api-key))]
-    (let [body (json/read-str (get resp :body) :key-fn keyword)]
+    json/read-str (get resp :body) :key-fn keyword))
+
+(defn get-directions [url]
+  )
+
+(defn get-recipe [id]
+  (let [resp (client/get (str yummly-get id "?" yummly-api-key))
+        body (json/read-str (get resp :body) :key-fn keyword)]
       (apply array-map [:title id,
       				   :ingredients (:ingredientLines body)
+                 :recipeName (:name body)
       				   :directions (:url (:attribution body))
-      				   :images ((nth (:images body) 0) :hostedSmallUrl)
+      				   :images (array-map :smallUrl ((nth (:images body) 0) :hostedSmallUrl) :largeUrl ((nth (:images body) 0) :hostedLargeUrl))
       				   :cooktime "30"
-      				   :id (:id body)]))))
+      				   :id (:id body)])))
 
 (defn get-random [matches]
   (->> (shuffle matches)
