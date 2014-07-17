@@ -8,7 +8,8 @@
             [clj-http.client :as client]
             [org.httpkit.server :as hs]
             [ring.middleware.json :refer [wrap-json-params]]
-            [ring.middleware.jsonp :refer [wrap-json-with-padding]]))
+            [ring.middleware.jsonp :refer [wrap-json-with-padding]]
+            [net.cgrand.enlive-html :as html]))
 
 (def yummly-search "http://api.yummly.com/v1/api/recipes?")
 (def yummly-api-key "_app_id=78dccce1&_app_key=87460fca330c28f52a9603ababd5a54f")
@@ -27,7 +28,7 @@
     json/read-str (get resp :body) :key-fn keyword))
 
 (defn get-directions [url]
-  )
+  (str url))
 
 (defn get-recipe [id]
   (let [resp (client/get (str yummly-get id "?" yummly-api-key))
@@ -35,9 +36,9 @@
       (apply array-map [:title id,
       				   :ingredients (:ingredientLines body)
                  :recipeName (:name body)
-      				   :directions (:url (:attribution body))
+      				   :directions (get-directions (:url (:attribution body)))
       				   :images (array-map :smallUrl ((nth (:images body) 0) :hostedSmallUrl) :largeUrl ((nth (:images body) 0) :hostedLargeUrl))
-      				   :cooktime "30"
+      				   :cooktime (:totalTime body)
       				   :id (:id body)])))
 
 (defn get-random [matches]

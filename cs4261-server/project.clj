@@ -9,6 +9,7 @@
                  [ring/ring-core "1.2.0"]
                  [ring/ring-core "1.2.0"]
                  [ring/ring-json "0.3.1"]
+                 [enlive "1.1.5"]
                  [ring.middleware.jsonp "0.1.4"]]
   :plugins [[lein-ring "0.8.10"]]
   :ring {:handler cs4261-server.handler/app})
