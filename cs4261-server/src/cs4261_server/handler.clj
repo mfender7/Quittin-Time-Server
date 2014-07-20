@@ -12,7 +12,7 @@
             [net.cgrand.enlive-html :as html]))
 
 (def yummly-search "http://api.yummly.com/v1/api/recipes?")
-(def yummly-api-key "_app_id=78dccce1&_app_key=87460fca330c28f52a9603ababd5a54f")
+(def yummly-api-key "_app_id=aaa3d044&_app_key=eaf844edbae432b839bd67f850612dc1")
 (def yummly-base-query "&allowedCourse[]=course^course-Main Dishes&maxTotalTimeInSeconds=3600&maxResult=500")
 (def yummly-base-food "")
 (def yummly-get "http://api.yummly.com/v1/api/recipe/")
