@@ -13,7 +13,7 @@
 
 (def yummly-search "http://api.yummly.com/v1/api/recipes?")
 (def yummly-api-key "_app_id=78dccce1&_app_key=87460fca330c28f52a9603ababd5a54f")
-(def yummly-base-query "&allowedCourse[]=course^course-Main Dishes&maxTotalTimeInSeconds=3600")
+(def yummly-base-query "&allowedCourse[]=course^course-Main Dishes&maxTotalTimeInSeconds=3600&maxResult=1000")
 (def yummly-base-food "")
 (def yummly-get "http://api.yummly.com/v1/api/recipe/")
 (def map-latlon "http://maps.googleapis.com/maps/api/geocode/json?")
@@ -24,39 +24,22 @@
   (clojure.string/replace url "/recipe/" "/recipe/external/"))
 
 (defn get-ids [request]
-  (json/read-str (get (client/get request) :body) :key-fn keyword))
+  (json/read-str (get (client/get request ) :body) :key-fn keyword))
 
 (defn get-yummly-body [id]
   (let [resp (client/get (str yummly-get id "?" yummly-api-key))]
     (json/read-str (get resp :body) :key-fn keyword)))
 
-(defn criteria? [data]
-  (and (> (.length (str (get (get data :attrs) :class))) 0)
-       (.contains (get (get data :attrs) :class) "item")
-       (or (.contains (get (get data :attrs) :class) "instruction ")
-           (.contains (get (get data :attrs) :class) "direction "))))
-
-(defn filter-data? [data]
-  (not (= data "")))
-
 (defn pull-items [data]
-  (if (criteria? data)
-    (get (nth (get data :content) 3) :content)
-    (str "")))
-
-(defn get-html-resource [url]
-  (->> (html/select (html/html-resource (java.net.URL. url)) [:li])
-       (map pull-items)
-       (filter filter-data?)))
+  (get (nth (get data :content) 0) :content))
 
 (defn get-actual-url [url]
   (let [res (html/select (html/html-resource (java.net.URL. (ext-url url))) [:td.close])]
     (get (get (nth (get (nth res 0) :content) 1) :attrs) :href)))
 
 (defn get-directions [url]
-  (->> (html/select (html/html-resource (java.net.URL. url)) [:li])
-       (map pull-items)
-       (filter filter-data?)))
+  (->> (html/select (html/html-resource (java.net.URL. url)) [:div.directions :div.directLeft :li])
+       (map pull-items)))
 
 (defn get-recipe [id]
   (let [resp (client/get (str yummly-get id "?" yummly-api-key))
@@ -70,7 +53,7 @@
       				   :id (:id body)])))
 
 (defn fil? [data]
-  (= (:sourceDisplayName data) "Martha Stewart"))
+  (= (:sourceDisplayName data) "AllRecipes"))
 
 (defn get-random [matches]
   (->> (shuffle matches)
@@ -93,7 +76,7 @@
 (defroutes app-routes
   (GET "/" [] (json/write-str "This is just some start screen to appease myself."))
   (GET "/somerecipe" {params :query-string} (json/write-str {:matches (search-recipes params)}))
-  (GET "/recipes" [] (json/write-str { :message (get-directions "http://www.marthastewart.com/326813/coconut-bars")}))
+  (GET "/recipes" [] (json/write-str { :message (fil? {:imageUrlsBySize {:90 "http://lh6.ggpht.com/7mRXudP6Wsr3PKoz0EyAknJ3IKuigaiVdiH4yTdRX8d4AWIStrOXvRSu9MjVmeOO_TZpQI8_WZdzyW9WuTFy_g=s90-c"} :sourceDisplayName "AllRecipes" :ingredients ["boneless skinless chicken breasts","chopped onion","garlic","cream cheese","butter","dough"] :id "Chicken-Puffs-Allrecipes", :smallImageUrls ["http://lh4.ggpht.com/AmQ0hUf_he7dabIq3qZd901wfjrIw4jlPlOPFo3V7IhCS63kyP32WDipGNKWuDWUqcT2EarxuAI0Vs3yikagOA=s90"] :recipeName "Chicken Puffs" :totalTimeInSeconds 2100 :attributes { :course ["Main Dishes","Appetizers","Lunch and Snacks"]} :flavors {:piquant 0.0 :meaty 0.5 :sour 0.8333333333333334,"bitter":0.6666666666666666 :salty 0.5 :sweet 0.3333333333333333} :rating 5})}))
   (POST "/user" {params :query-params} (str "todo: update users"))
   (PUT "/user" {params :query-params} (str "todo: create users"))
   (GET "/latlong" {params :query-string} (get-latlong params))
