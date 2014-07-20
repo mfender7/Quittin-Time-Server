@@ -12,8 +12,8 @@
             [net.cgrand.enlive-html :as html]))
 
 (def yummly-search "http://api.yummly.com/v1/api/recipes?")
-(def yummly-api-key "_app_id=aaa3d044&_app_key=eaf844edbae432b839bd67f850612dc1")
-(def yummly-base-query "&allowedCourse[]=course^course-Main Dishes&maxTotalTimeInSeconds=3600&maxResult=450")
+(def yummly-api-key "_app_id=120b31ce&_app_key=da849f95c57c3af4a033cb06a5f0b986")
+(def yummly-base-query "&allowedCourse[]=course^course-Main Dishes&maxTotalTimeInSeconds=3600&maxResult=600")
 (def yummly-base-food "")
 (def yummly-get "http://api.yummly.com/v1/api/recipe/")
 (def map-latlon "http://maps.googleapis.com/maps/api/geocode/json?")
@@ -56,8 +56,8 @@
   (= (:sourceDisplayName data) "AllRecipes"))
 
 (defn get-random [matches]
-  (->> (shuffle matches)
-       (filter fil?)
+  (->> (filter fil? matches)
+       (shuffle)
        (map :id)
        (take 3)))
 
