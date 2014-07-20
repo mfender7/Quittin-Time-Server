@@ -13,7 +13,7 @@
 
 (def yummly-search "http://api.yummly.com/v1/api/recipes?")
 (def yummly-api-key "_app_id=78dccce1&_app_key=87460fca330c28f52a9603ababd5a54f")
-(def yummly-base-query "&allowedCourse[]=course^course-Main Dishes&maxTotalTimeInSeconds=3600&maxResult=1000")
+(def yummly-base-query "&allowedCourse[]=course^course-Main Dishes&maxTotalTimeInSeconds=3600&maxResult=500")
 (def yummly-base-food "")
 (def yummly-get "http://api.yummly.com/v1/api/recipe/")
 (def map-latlon "http://maps.googleapis.com/maps/api/geocode/json?")
@@ -62,7 +62,7 @@
        (take 3)))
 
 (defn search-recipes [param]
-  (let [req (str yummly-search yummly-api-key yummly-base-query yummly-base-food)
+  (let [req (str yummly-search yummly-api-key yummly-base-query param)
         matches (:matches (get-ids req))]
     (->> (get-random matches)
          (map get-recipe))))
