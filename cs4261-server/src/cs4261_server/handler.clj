@@ -62,7 +62,7 @@
        (take 3)))
 
 (defn search-recipes [param]
-  (let [req (str yummly-search yummly-api-key yummly-base-query "?" param)
+  (let [req (str yummly-search yummly-api-key yummly-base-query "&" param)
         matches (:matches (get-ids req))]
     (->> (get-random matches)
          (map get-recipe))))
