@@ -1,4 +1,4 @@
-(ns cs4261-server.handler
+(ns quittin-time.handler
   (:use compojure.core)
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
