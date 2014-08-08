@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: ring.middleware.jsonp:0.1.4">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/ring/middleware/jsonp/ring.middleware.jsonp/0.1.4/ring.middleware.jsonp-0.1.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
