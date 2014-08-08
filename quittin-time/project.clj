@@ -12,6 +12,7 @@
                  [enlive "1.1.5"]
                  [ring.middleware.jsonp "0.1.4"]
                  [korma "0.3.0"]
-                 [org.postgresql/postgresql "9.3-1102-jdbc4"]]
+                 [org.postgresql/postgresql "9.3-1102-jdbc41"]]
+  :repositories {"local" ~(str (.toURI (java.io.File. "maven_repository")))}
   :plugins [[lein-ring "0.8.10"]]
   :ring {:handler quittin-time.handler/app})
