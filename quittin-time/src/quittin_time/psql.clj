@@ -2,7 +2,7 @@
   (:require [clojure.java.jdbc :as sql]
             [clojure.string :as string]))
 
-(def conn "postgresql://80.74.134.201:5432/quittintime")
+(def conn "postgresql://localhost:5432/quittintime")
 
 (defn index-of [e coll]
   (first (keep-indexed #(if (= e %2) %1) coll)))
