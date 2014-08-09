@@ -8,6 +8,7 @@
             [clj-http.client :as client]
             [org.httpkit.server :as hs]
             [quittin-time.psql :as psql]
+            [quittin-time.scraper :as scraper]
             [ring.middleware.json :refer [wrap-json-params]]
             [ring.middleware.jsonp :refer [wrap-json-with-padding]]
             [net.cgrand.enlive-html :as html]))
@@ -24,7 +25,7 @@
 
 (defroutes app-routes
   (GET "/" [] (json/write-str "This is just some start screen to appease myself."))
-  (GET "/somerecipe" {params :query-string} (json/write-str "THE HELL WITH IT"))
+  (GET "/somerecipe" [] (json/write-str (scraper/search-recipes)))
   (GET "/recipes" [] (json/write-str (psql/get-random)))
   (POST "/user" {params :query-params} (str "todo: update users"))
   (PUT "/user" {params :query-params} (str "todo: create users"))

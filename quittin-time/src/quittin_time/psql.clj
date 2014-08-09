@@ -4,9 +4,8 @@
 
 (def conn "postgresql://80.74.134.201:5432/quittintime")
 
-(defn strip-id [item]
-  (apply dissoc item [:recipe_id]))
-
+(defn index-of [e coll]
+  (first (keep-indexed #(if (= e %2) %1) coll)))
 
 (defn keywordify [items]
   (into {}
@@ -19,7 +18,6 @@
               where r.recipe_id = ? order by step" id])]
     (->> (map :hstore dir)
          (map keywordify))))
-
 
 (defn get-random-recipes []
   (into [] (map :hstore (sql/query conn
@@ -42,5 +40,21 @@
 (defn get-random []
   (->> (get-random-recipes)
        (map keywordify)
-       (map construct-response))
-  )
+       (map construct-response)))
+
+(defn save-directions [coll id direction]
+    (sql/insert! conn :recipedirections {:recipe_id id
+                                         :step (int (+ (index-of direction coll) 1))
+                                         :direction "direction"}))
+
+(defn save-recipe [recipe]
+  (sql/insert! conn :recipe {:recipe_id (:id recipe)
+                             :name (:recipeName recipe)
+                             :total_time (:cooktime recipe)
+                             :ingredients (clojure.string/join "," (:ingredients recipe))
+                             :image_small (:smallUrl (:images recipe))
+                             :image_large (:largeUrl (:images recipe))})
+  (doseq [d (:directions recipe)]
+    (sql/insert! conn :recipedirections {:recipe_id (:id recipe)
+                                         :step (+ (index-of d (:directions recipe)) 1)
+                                         :direction (first d)})))
