@@ -3,7 +3,7 @@
             [clojure.string :as string]))
 
 (def db {:subprotocol "mysql"
-               :subname "//80.74.134.201:3306/quittintime"
+               :subname "//localhost:3306/quittintime"
                :user "root"
                :password ""})
 
