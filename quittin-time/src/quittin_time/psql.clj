@@ -3,7 +3,7 @@
             [clojure.string :as string]))
 
 (def db {:subprotocol "mysql"
-               :subname "//localhost:3306/quittintime"
+               :subname "//80.74.134.201:3306/quittintime"
                :user "root"
                :password ""})
 
@@ -16,9 +16,9 @@
           [(keyword k) v])))
 
 (defn get-directions [id]
-  (sql/query db
-             ["select step, direction from recipedirections
-              where recipe_id = ? order by step" id]))
+  (into [] (map :direction (sql/query db
+             ["select direction from recipedirections
+              where recipe_id = ? order by step" id]))))
 
 (defn get-random-recipes []
   (into [] (sql/query db
