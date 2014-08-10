@@ -11,8 +11,8 @@
                  [ring/ring-json "0.3.1"]
                  [enlive "1.1.5"]
                  [ring.middleware.jsonp "0.1.4"]
-                 [korma "0.3.0"]
-                 [org.postgresql/postgresql "9.3-1102-jdbc41"]]
+                 [org.clojure/java.jdbc "0.3.5"]
+                 [mysql/mysql-connector-java "5.1.25"]]
   :repositories {"local" ~(str (.toURI (java.io.File. "maven_repository")))}
   :plugins [[lein-ring "0.8.10"]]
   :ring {:handler quittin-time.handler/app})

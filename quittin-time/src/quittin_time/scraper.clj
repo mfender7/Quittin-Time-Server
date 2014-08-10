@@ -57,4 +57,5 @@
         matches (:matches (get-ids req))]
     (->> (get-random matches)
          (map get-recipe)
-         (map psql/save-recipe))))
+         (map psql/save-recipe))
+    (str "Success!")))
